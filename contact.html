@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+	<head>
+		<title>藏峰工作室</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="static/css/main.css"/>
+	</head>
+	<body>
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<a class="logo pull-left" href="#">
+					<h1>藏峰<span></span></h1>
+				</a>
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse" aria-expanded="false">
+				        <span class="sr-only">Toggle navigation</span>
+				        <span class="icon-bar"></span>
+				        <span class="icon-bar"></span>
+				        <span class="icon-bar"></span>
+				   </button>
+				</div>
+				<div class="collapse navbar-collapse " id="bs-example-navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li class="navBg"></li>
+						<li>
+							<a href="index.html">网站首页</a>
+						</li>
+						<li>
+							<a href="service.html">服务案例</a>
+						</li>
+						<li>
+							<a href="news.html">新闻中心</a>
+						</li>
+						<li class="active">
+							<a href="contact.html">联系我们</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!--space-->
+		<div class="space"></div>
+		<div class="conPg">
+			<div class="banner">
+				<img src="static/images/banner/ban2.jpg"/>
+			</div>
+			<div class="container padT80">
+				<div class="address row padT80 padB80">
+					<div class="col-sm-6 col-xs-12">
+						<section class="title">
+							<h2>联系我们</h2>
+						</section>
+					</div>
+					<div class="col-sm-6 col-xs-12 padT80">
+						<form id="contactForm">
+							<input placeholder="姓名" type="text" id="name" name="name" required/>
+							<input placeholder="邮箱" type="email" id="email" name="email" required/>
+							<input placeholder="电话" type="text" id="text" name="phone" required/>
+							<textarea placeholder="请告诉我们，您的需求，我们会在24小时内联系您！" rows="5" id="message" name="message" required></textarea>
+						</form>
+						<a class="btn btn-primary" id="submitBtn">发送</a>
+						<div id="messageStatus" style="margin-top: 15px; display: none;"></div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<footer>
+			<nav>
+				<ul>
+					<li><a href="index.html">网站首页</a></li>
+					<li><a href="service.html">服务案例</a></li>
+					<li><a href="news.html">新闻中心</a></li>
+					<li><a href="contact.html">联系我们</a></li>
+				</ul>
+			</nav>
+			<p>
+				<span >QQ：328965844</span>
+				<span>email：yymm-31@163.com</span>
+			</p>
+		</footer>
+		<script src="static/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="static/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="static/js/main.js" type="text/javascript" charset="utf-8"></script>
+		
+		<!-- 添加表单提交脚本 - 只使用POST方法，避免OPTIONS预检 -->
+		<script type="text/javascript">
+		$(document).ready(function() {
+			// 配置您的服务器地址和端口
+			var API_URL = 'http://localhost:9001/cfworkroom/ask';
+			
+			// 获取DOM元素
+			var $submitBtn = $('#submitBtn');
+			var $form = $('#contactForm');
+			var $name = $('#name');
+			var $email = $('#email');
+			var $phone = $('#text');
+			var $message = $('#message');
+			var $statusDiv = $('#messageStatus');
+			
+			// 显示状态消息的函数
+			function showStatus(message, isError) {
+				$statusDiv.text(message);
+				$statusDiv.css({
+					'display': 'block',
+					'color': isError ? '#ff0000' : '#00aa00',
+					'padding': '10px',
+					'border-radius': '5px',
+					'background-color': isError ? '#ffe6e6' : '#e6ffe6'
+				});
+				
+				// 5秒后自动隐藏消息
+				setTimeout(function() {
+					$statusDiv.fadeOut();
+				}, 5000);
+			}
+			
+			// 表单验证函数
+			function validateForm() {
+				if (!$name.val().trim()) {
+					showStatus('请填写姓名', true);
+					$name.focus();
+					return false;
+				}
+				
+				if (!$email.val().trim()) {
+					showStatus('请填写邮箱', true);
+					$email.focus();
+					return false;
+				}
+				
+				// 邮箱格式验证
+				var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (!emailRegex.test($email.val().trim())) {
+					showStatus('请输入有效的邮箱地址', true);
+					$email.focus();
+					return false;
+				}
+				
+				if (!$phone.val().trim()) {
+					showStatus('请填写电话', true);
+					$phone.focus();
+					return false;
+				}
+				
+				// 电话格式验证
+				var phoneRegex = /^[\d\-+\s()]+$/;
+				if (!phoneRegex.test($phone.val().trim())) {
+					showStatus('请输入有效的电话号码', true);
+					$phone.focus();
+					return false;
+				}
+				
+				if (!$message.val().trim()) {
+					showStatus('请填写您的需求', true);
+					$message.focus();
+					return false;
+				}
+				
+				return true;
+			}
+			
+			// 提交表单数据 - 使用 application/x-www-form-urlencoded 格式
+			function submitForm() {
+				// 验证表单
+				if (!validateForm()) {
+					return;
+				}
+				
+				// 收集表单数据并编码为 URL 编码格式
+				var formData = new URLSearchParams();
+				formData.append('name', $name.val().trim());
+				formData.append('email', $email.val().trim());
+				formData.append('phone', $phone.val().trim());
+				formData.append('message', $message.val().trim());
+				formData.append('timestamp', new Date().toISOString());
+				formData.append('page', window.location.href);
+				
+				// 显示加载状态
+				$submitBtn.text('发送中...');
+				$submitBtn.css('opacity', '0.6');
+				$submitBtn.attr('disabled', true);
+				
+				// 发送POST请求 - 使用 application/x-www-form-urlencoded 避免OPTIONS预检
+				$.ajax({
+					url: API_URL,
+					type: 'POST',
+					contentType: 'application/x-www-form-urlencoded',  // 关键：使用表单编码格式
+					data: formData.toString(),  // 转换为 URL 编码字符串
+					success: function(response) {
+						// 提交成功
+						//showStatus('提交成功！我们会在24小时内联系您！', false);
+						alert('您的信息，我们已收到。会尽快联系您，谢谢！');
+						// 清空表单
+						$form[0].reset();
+					},
+					error: function(xhr, status, error) {
+						// 提交失败
+						var errorMsg = '提交失败，请稍后重试';
+						
+						console.log(xhr);
+						// 尝试获取服务器返回的错误信息
+						if (xhr.responseJSON && xhr.responseJSON.message) {
+							errorMsg = xhr.responseJSON.message;
+						} else if (xhr.status === 0) {
+							errorMsg = '网络连接失败，请检查网络设置或服务器是否启动';
+						} else if (xhr.status === 404) {
+							errorMsg = '服务器地址配置错误，请联系管理员';
+						} else if (xhr.status === 500) {
+							errorMsg = '服务器内部错误，请稍后重试';
+						} else if (xhr.status === 200) {
+							// 有时200也会进入error回调，检查响应内容
+							console.log('响应内容:', xhr.responseText);
+							errorMsg = '提交成功！';
+							showStatus(errorMsg, false);
+							$form[0].reset();
+							return;
+						}
+						
+						showStatus(errorMsg, true);
+						console.error('提交失败:', status, error, xhr);
+						console.log('请求数据:', formData.toString());
+					},
+					complete: function() {
+						// 恢复按钮状态
+						$submitBtn.text('发送');
+						$submitBtn.css('opacity', '1');
+						$submitBtn.attr('disabled', false);
+					}
+				});
+			}
+			
+			// 绑定提交事件
+			$submitBtn.on('click', submitForm);
+			
+			// 支持按回车键提交
+			$form.on('keypress', function(e) {
+				if (e.which === 13 && !$(e.target).is('textarea')) {
+					e.preventDefault();
+					submitForm();
+				}
+			});
+			
+			// 实时验证提示
+			$name.on('blur', function() {
+				if (!$(this).val().trim()) {
+					$(this).css('border-color', '#ff0000');
+				} else {
+					$(this).css('border-color', '');
+				}
+			});
+			
+			$email.on('blur', function() {
+				var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (!emailRegex.test($(this).val().trim())) {
+					$(this).css('border-color', '#ff0000');
+				} else {
+					$(this).css('border-color', '');
+				}
+			});
+			
+			$phone.on('blur', function() {
+				if (!$(this).val().trim()) {
+					$(this).css('border-color', '#ff0000');
+				} else {
+					$(this).css('border-color', '');
+				}
+			});
+			
+			$message.on('blur', function() {
+				if (!$(this).val().trim()) {
+					$(this).css('border-color', '#ff0000');
+				} else {
+					$(this).css('border-color', '');
+				}
+			});
+			
+			// 控制台输出配置信息
+			//console.log('表单提交脚本已加载，API地址:', API_URL);
+			//console.log('使用 application/x-www-form-urlencoded 格式，不会触发 OPTIONS 预检请求');
+		});
+		</script>
+	</body>
+</html>
